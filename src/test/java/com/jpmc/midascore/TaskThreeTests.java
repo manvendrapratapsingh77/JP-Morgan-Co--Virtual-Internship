@@ -23,6 +23,9 @@ public class TaskThreeTests {
     @Autowired
     private FileLoader fileLoader;
 
+    @Autowired
+    private com.jpmc.midascore.repository.UserRepository userRepository;
+
     @Test
     void task_three_verifier() throws InterruptedException {
         userPopulator.populate();
@@ -30,8 +33,15 @@ public class TaskThreeTests {
         for (String transactionLine : transactionLines) {
             kafkaProducer.send(transactionLine);
         }
-        Thread.sleep(2000);
+        Thread.sleep(5000); // Increased sleep to ensure all messages are processed
 
+        userRepository.findAll().forEach(user -> {
+            if (user.getName().equals("waldorf")) {
+                logger.info("----------------------------------------------------------");
+                logger.info("WALDORF BALANCE: {}", user.getBalance());
+                logger.info("----------------------------------------------------------");
+            }
+        });
 
         logger.info("----------------------------------------------------------");
         logger.info("----------------------------------------------------------");
